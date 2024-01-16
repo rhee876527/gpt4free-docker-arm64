@@ -38,6 +38,6 @@ jobs:
       - name: Sync with upstream (if release available)
         if: steps.check-release.outputs.release-available == 'true'
         run: |
-          git pull upstream main
+          git pull --no-edit --no-rebase upstream main
           git commit -am "Sync with upstream version: $(echo "${{ steps.current-version.outputs.version }}") to $(echo "${{ steps.check-release.outputs.new-version }}")"
           git push origin main
