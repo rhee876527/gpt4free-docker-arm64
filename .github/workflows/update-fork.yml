@@ -1,43 +1,43 @@
-name: Sync Fork with Upstream
+name: Sync
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # Run daily at midnight
+    - cron: '0 0 * * *'  # Run daily, adjust the schedule as needed
+  workflow_dispatch:
 
 jobs:
-  sync:
+  sync-fork:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Git
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+    - name: Set up Git
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git remote add upstream https://github.com/xtekky/gpt4free.git  
 
-      - name: Get current version
-        id: current-version
-        run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
+    - name: Fetch upstream changes
+      run: git fetch upstream
 
-      - name: Fetch upstream changes
-        run: git remote add upstream https://github.com/xtekky/gpt4free && git fetch upstream
+    - name: Check for changes
+      id: check_changes
+      run: echo ::set-output name=changes::$(git diff --name-only HEAD...upstream/main | wc -l)
 
-      - name: Check for new release
-        id: check-release
-        run: |
-          if [ "$(git rev-parse HEAD)" != "$(git rev-parse upstream/main)" ]; then
-            echo "::set-output name=release-available::true"
-            echo "::set-output name=new-version::$(git describe --tags)"
-          else
-            echo "::set-output name=release-available::false"
-          fi
+    - name: Merge changes (excluding some actions)
+      if: steps.check_changes.outputs.changes > 0
+      run: |
+        git merge --no-commit --no-ff upstream/main
+        # Skip the specific file from being committed
+        git checkout --theirs -- .github/workflows/unittest.yml .github/workflows/close-inactive-issues.yml .github/workflows/publish-to-pypi.yml .github/workflows/publish-workflow.yaml
+        git add -u 
+      
+    - name: Commit changes
+      if: steps.check_changes.outputs.changes > 0
+      run: git commit -m "Sync upstream changes"
 
-      - name: Sync with upstream (if release available)
-        if: steps.check-release.outputs.release-available == 'true'
-        run: |
-          git pull --no-edit --no-rebase --allow-unrelated-histories upstream main
-          git commit -am "Sync with upstream version: $(echo "${{ steps.current-version.outputs.version }}") to $(echo "${{ steps.check-release.outputs.new-version }}")"
-          git push origin main
+    - name: Push changes to fork
+      if: steps.check_changes.outputs.changes > 0
+      run: git push origin HEAD
