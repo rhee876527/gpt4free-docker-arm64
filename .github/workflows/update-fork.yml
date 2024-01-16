@@ -1,0 +1,43 @@
+name: Sync Fork with Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Get current version
+        id: current-version
+        run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
+
+      - name: Fetch upstream changes
+        run: git remote add upstream https://github.com/xtekky/gpt4free && git fetch upstream
+
+      - name: Check for new release
+        id: check-release
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse upstream/main)" ]; then
+            echo "::set-output name=release-available::true"
+            echo "::set-output name=new-version::$(git describe --tags)"
+          else
+            echo "::set-output name=release-available::false"
+          fi
+
+      - name: Sync with upstream (if release available)
+        if: steps.check-release.outputs.release-available == 'true'
+        run: |
+          git pull upstream main
+          git commit -am "Sync with upstream version: $(echo "${{ steps.current-version.outputs.version }}") to $(echo "${{ steps.check-release.outputs.new-version }}")"
+          git push origin main
