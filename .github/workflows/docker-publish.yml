@@ -1,9 +1,8 @@
 name: docker-publish
 
 on:
-  workflow_run:
-    types:
-      - released
+  push:
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
