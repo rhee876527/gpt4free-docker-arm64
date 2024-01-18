@@ -20,18 +20,18 @@ jobs:
         git remote add upstream https://github.com/xtekky/gpt4free.git  
 
     - name: Fetch upstream changes
-      run: git fetch upstream
-
+      run: git fetch upstream main:upstream_main
+  
     - name: Check for changes
       id: check_changes
-      run: echo ::set-output name=changes::$(git diff --name-only HEAD...upstream/main | wc -l)
+      run: echo ::set-output name=changes::$(git diff --name-only HEAD...upstream_main | wc -l)
 
     - name: Merge changes (excluding some actions)
       if: steps.check_changes.outputs.changes > 0
       run: |
         git merge --no-commit --no-ff upstream/main
         # Skip the specific file from being committed
-        git checkout --theirs -- .github/workflows/unittest.yml .github/workflows/close-inactive-issues.yml .github/workflows/publish-to-pypi.yml .github/workflows/publish-workflow.yaml
+        git checkout --theirs -- .github/workflows/*.{yml,yaml}
         git add -u 
       
     - name: Commit changes
