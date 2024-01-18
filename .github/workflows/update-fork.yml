@@ -20,11 +20,11 @@ jobs:
         git remote add upstream https://github.com/xtekky/gpt4free.git  
 
     - name: Fetch upstream changes
-      run: git fetch upstream main:upstream_main
+      run: git fetch upstream main
   
     - name: Check for changes
       id: check_changes
-      run: echo ::set-output name=changes::$(git diff --name-only HEAD...upstream_main | wc -l)
+      run: echo ::set-output name=changes::$(git diff --name-only HEAD..upstream/main | wc -l)
 
     - name: Merge changes (excluding some actions)
       if: steps.check_changes.outputs.changes > 0
