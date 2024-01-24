@@ -20,7 +20,7 @@ jobs:
         git remote add upstream https://github.com/xtekky/gpt4free.git  
 
     - name: Fetch upstream changes
-      run: git fetch upstream main
+      run: git fetch upstream
   
     - name: Check for changes
       id: check_changes
