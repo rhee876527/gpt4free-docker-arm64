@@ -24,14 +24,19 @@ jobs:
   
     - name: Check for changes
       id: check_changes
-      run: echo ::set-output name=changes::$(git diff --name-only HEAD...upstream/main | wc -l)
+      run: |
+        changes=$(git diff --name-only HEAD...upstream/main | wc -l)
+        if [[ $changes -eq 0 ]]; then
+          echo "No changes detected in the upstream repository."
+          exit 1
+        fi
       
-    - name: Merge changes (excluding some actions)
+    - name: Merge changes (excluding some files)
       if: steps.check_changes.outputs.changes > 0
       run: |
-        git merge --no-commit --no-ff upstream/main
+        git merge --no-commit --no-ff upstream/main || echo "Merge failed. Reason: $(git status --short)"
         # Skip the specific file from being committed
-        git checkout --theirs -- .github/workflows/*.{yml,yaml}
+        git checkout --theirs -- .github/workflows/*.{yml,yaml} requirements.txt
         git add -u 
       
     - name: Commit changes
