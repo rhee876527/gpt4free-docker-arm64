@@ -20,4 +20,5 @@ undetected-chromedriver
 brotli
 beautifulsoup4
 setuptools
+aiohttp_socks
 g4f
