@@ -21,4 +21,4 @@ brotli
 beautifulsoup4
 setuptools
 aiohttp_socks
-g4f==0.2.0.6
+g4f
