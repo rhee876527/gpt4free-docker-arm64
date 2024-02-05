@@ -21,4 +21,4 @@ brotli
 beautifulsoup4
 setuptools
 aiohttp_socks
-g4f
+g4f[gui]
