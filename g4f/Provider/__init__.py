@@ -46,12 +46,12 @@ from .GptGod          import GptGod
 from .GptTalkRu       import GptTalkRu
 from .Hashnode        import Hashnode
 from .HuggingChat     import HuggingChat
+from .HuggingFace     import HuggingFace
 from .Koala           import Koala
 from .Liaobots        import Liaobots
 from .Llama2          import Llama2
 from .OnlineGpt       import OnlineGpt
 from .PerplexityLabs  import PerplexityLabs
-from .Phind           import Phind
 from .Pi              import Pi
 from .Vercel          import Vercel
 from .Ylokh           import Ylokh
