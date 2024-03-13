@@ -21,4 +21,5 @@ brotli
 beautifulsoup4
 setuptools
 aiohttp_socks
-g4f
+selenium-wire
+gpt4all
