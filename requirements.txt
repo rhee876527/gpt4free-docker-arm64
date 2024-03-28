@@ -21,3 +21,4 @@ gpt4all
 pywebview
 plyer
 pycryptodome
+g4f
